@@ -7,8 +7,8 @@ import (
 	"strings"
 )
 
-// parseJWT extracts and parse token
-func parseJWT(token string, user any) error {
+// ParseJWT extracts and parse token
+func ParseJWT(token string, user any) error {
 	if len(token) < 7 {
 		return errors.New("bearer token required")
 	}
