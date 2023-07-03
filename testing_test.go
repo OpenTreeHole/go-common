@@ -26,6 +26,9 @@ func TestTesting(t *testing.T) {
 		users[i] = User{ID: i}
 	}
 
+	app.Use(MiddlewareGetUserID)
+	app.Use(MiddlewareCustomLogger)
+
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hello, World!")
 	})
@@ -49,6 +52,14 @@ func TestTesting(t *testing.T) {
 		}
 		users[user.ID] = *user
 		return c.Status(fiber.StatusCreated).JSON(user)
+	})
+
+	app.Get("/jwt", func(c *fiber.Ctx) error {
+		userID, err := GetUserID(c)
+		if err != nil {
+			return err
+		}
+		return c.JSON(Map{"user_id": userID})
 	})
 
 	RegisterApp(app)
@@ -78,4 +89,24 @@ func TestTesting(t *testing.T) {
 		RequestBody:    map[string]any{"id": "1"},
 		ExpectedStatus: fiber.StatusBadRequest,
 	})
+
+	/* Test GET /jwt */
+	// Test GET /jwt without token
+	DefaultTester.Get(t, RequestConfig{Route: "/jwt", ExpectedStatus: fiber.StatusUnauthorized})
+
+	// Test GET /jwt with invalid token
+	UserTester.Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2ODgzOTQwMDEsInVzZXJfaWQiOjEsInR5cGUiOiJhY2Nlc3MiLCJ1aWQiOjF9"
+	UserTester.Get(t, RequestConfig{Route: "/jwt", ExpectedStatus: fiber.StatusUnauthorized})
+
+	// Test GET /jwt with valid token and id field
+	UserTester.Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2ODgzOTQwMDEsImlkIjoxLCJ0eXBlIjoiYWNjZXNzIiwidWlkIjoxfQ.JQZdPizvZyI7-Fg8uHN45t4URShtVYtFvt9Mif7ArQk"
+	UserTester.Get(t, RequestConfig{Route: "/jwt", ExpectedBody: `{"user_id":1}`})
+
+	// Test GET /jwt with valid token and user_id field
+	UserTester.Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2ODgzOTQwMDEsInVzZXJfaWQiOjEsInR5cGUiOiJhY2Nlc3MiLCJ1aWQiOjF9.LBPhM9rK4zMctR1_-TTfOtrXmtXaAlAUzTwIGuJJhgI"
+	UserTester.Get(t, RequestConfig{Route: "/jwt", ExpectedBody: `{"user_id":1}`})
+
+	// Test GET /jwt with header X-CONSUMER-USERNAME
+	UserTester.Token = ""
+	UserTester.Get(t, RequestConfig{Route: "/jwt", ExpectedBody: `{"user_id":1}`, RequestHeaders: map[string]string{"X-CONSUMER-USERNAME": "1"}})
 }

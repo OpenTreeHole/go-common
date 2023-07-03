@@ -39,13 +39,14 @@ func RegisterApp(app *fiber.App) {
 
 // RequestConfig is a struct that contains the config of a request
 type RequestConfig struct {
-	Method         string `default:"GET"`
-	Route          string `default:"/"`
-	ExpectedStatus int    `default:"200"`
-	RequestQuery   any    `default:"-"`
-	RequestBody    any    `default:"-"`
-	ResponseModel  any    `default:"-"`
-	ExpectedBody   string `default:"-"`
+	Method         string            `default:"GET"`
+	Route          string            `default:"/"`
+	ExpectedStatus int               `default:"200"`
+	RequestHeaders map[string]string `default:"-"`
+	RequestQuery   any               `default:"-"`
+	RequestBody    any               `default:"-"`
+	ResponseModel  any               `default:"-"`
+	ExpectedBody   string            `default:"-"`
 }
 
 func (tester *Tester) Request(t assert.TestingT, config RequestConfig) {
@@ -80,6 +81,11 @@ func (tester *Tester) Request(t assert.TestingT, config RequestConfig) {
 	req.Header.Add("Content-Type", "application/json")
 	if tester.Token != "" {
 		req.Header.Add("Authorization", "Bearer "+tester.Token)
+	}
+	if config.RequestHeaders != nil {
+		for key, value := range config.RequestHeaders {
+			req.Header.Add(key, value)
+		}
 	}
 
 	res, err := App.Test(req, -1)
