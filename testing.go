@@ -3,6 +3,7 @@ package common
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"github.com/creasty/defaults"
 	"github.com/gofiber/fiber/v2"
 	"github.com/hetiansu5/urlquery"
@@ -47,6 +48,7 @@ type RequestConfig struct {
 	RequestBody    any               `default:"-"`
 	ResponseModel  any               `default:"-"`
 	ExpectedBody   string            `default:"-"`
+	ContentType    string            `default:"application/json"`
 }
 
 func (tester *Tester) Request(t assert.TestingT, config RequestConfig) {
@@ -69,7 +71,16 @@ func (tester *Tester) Request(t assert.TestingT, config RequestConfig) {
 		route += "?" + string(queryData)
 	}
 	if config.RequestBody != nil {
-		requestData, err = json.Marshal(config.RequestBody)
+		if data, ok := config.RequestBody.(string); ok {
+			requestData = []byte(data)
+		} else if config.ContentType == "application/json" {
+			requestData, err = json.Marshal(config.RequestBody)
+		} else if config.ContentType == "application/x-www-form-urlencoded" {
+			requestData, err = urlquery.Marshal(config.RequestBody)
+		} else {
+			err = errors.New("unsupported content type: " + config.ContentType)
+		}
+
 		assert.Nilf(t, err, "encode request body")
 	}
 	req, err := http.NewRequest(
@@ -78,7 +89,7 @@ func (tester *Tester) Request(t assert.TestingT, config RequestConfig) {
 		bytes.NewBuffer(requestData),
 	)
 	assert.Nilf(t, err, "constructs http request")
-	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("Content-Type", config.ContentType)
 	if tester.Token != "" {
 		req.Header.Add("Authorization", "Bearer "+tester.Token)
 	}

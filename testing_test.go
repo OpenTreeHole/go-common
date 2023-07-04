@@ -62,6 +62,11 @@ func TestTesting(t *testing.T) {
 		return c.JSON(Map{"user_id": userID})
 	})
 
+	app.Post("/form", func(c *fiber.Ctx) error {
+		value := c.FormValue("data")
+		return c.Status(201).SendString(value)
+	})
+
 	RegisterApp(app)
 
 	// Test GET /
@@ -109,4 +114,12 @@ func TestTesting(t *testing.T) {
 	// Test GET /jwt with header X-CONSUMER-USERNAME
 	UserTester.Token = ""
 	UserTester.Get(t, RequestConfig{Route: "/jwt", ExpectedBody: `{"user_id":1}`, RequestHeaders: map[string]string{"X-CONSUMER-USERNAME": "1"}})
+
+	// Test POST /form
+	DefaultTester.Post(t, RequestConfig{
+		Route:        "/form",
+		RequestBody:  Map{"data": "test"},
+		ExpectedBody: "test",
+		ContentType:  fiber.MIMEApplicationForm,
+	})
 }
