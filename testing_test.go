@@ -11,7 +11,7 @@ import (
 func TestTesting(t *testing.T) {
 	app := fiber.New(fiber.Config{
 		AppName:               "test",
-		ErrorHandler:          CommonErrorHandler,
+		ErrorHandler:          ErrorHandler,
 		JSONDecoder:           json.Unmarshal,
 		JSONEncoder:           json.Marshal,
 		DisableStartupMessage: true,

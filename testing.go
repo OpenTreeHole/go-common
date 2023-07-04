@@ -108,14 +108,14 @@ func (tester *Tester) Request(t assert.TestingT, config RequestConfig) {
 
 	if res.StatusCode >= 400 {
 		log.Print(string(responseBody))
-	} else {
-		if config.ExpectedBody != "" {
-			assert.Equalf(t, config.ExpectedBody, string(responseBody), "response body")
-		}
-		if model != nil {
-			err = json.Unmarshal(responseBody, model)
-			assert.Nilf(t, err, "decode response")
-		}
+	}
+
+	if config.ExpectedBody != "" {
+		assert.Equalf(t, config.ExpectedBody, string(responseBody), "response body")
+	}
+	if model != nil {
+		err = json.Unmarshal(responseBody, model)
+		assert.Nilf(t, err, "decode response")
 	}
 }
 

@@ -49,7 +49,7 @@ func Forbidden(messages ...string) *HttpError {
 	}
 }
 
-func CommonErrorHandler(ctx *fiber.Ctx, err error) error {
+func ErrorHandler(ctx *fiber.Ctx, err error) error {
 	if err == nil {
 		return nil
 	}
