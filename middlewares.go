@@ -3,6 +3,7 @@ package common
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog/log"
+	"runtime/debug"
 	"strconv"
 	"time"
 )
@@ -79,4 +80,8 @@ func MiddlewareCustomLogger(c *fiber.Ctx) error {
 	}
 	output.Msg("http log")
 	return nil
+}
+
+func StackTraceHandler(_ *fiber.Ctx, e any) {
+	log.Error().Any("panic", e).Bytes("stack", debug.Stack()).Msg("stacktrace")
 }

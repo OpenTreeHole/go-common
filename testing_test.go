@@ -3,6 +3,8 @@ package common
 import (
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 	"testing"
@@ -26,6 +28,7 @@ func TestTesting(t *testing.T) {
 		users[i] = User{ID: i}
 	}
 
+	app.Use(recover.New(recover.Config{EnableStackTrace: true, StackTraceHandler: StackTraceHandler}))
 	app.Use(MiddlewareGetUserID)
 	app.Use(MiddlewareCustomLogger)
 
@@ -65,6 +68,12 @@ func TestTesting(t *testing.T) {
 	app.Post("/form", func(c *fiber.Ctx) error {
 		value := c.FormValue("data")
 		return c.Status(201).SendString(value)
+	})
+
+	app.Get("/panic", func(c *fiber.Ctx) error {
+		// try panic
+		log.Panic().Msg("panic")
+		return nil
 	})
 
 	RegisterApp(app)
@@ -122,4 +131,7 @@ func TestTesting(t *testing.T) {
 		ExpectedBody: "test",
 		ContentType:  fiber.MIMEApplicationForm,
 	})
+
+	// Test Get /panic
+	DefaultTester.Get(t, RequestConfig{Route: "/panic", ExpectedStatus: fiber.StatusInternalServerError})
 }
