@@ -28,3 +28,20 @@ func TestKeys(t *testing.T) {
 	slices.Sort(keys)
 	assert.EqualValues(t, []string{"a", "b"}, keys)
 }
+
+func TestValues(t *testing.T) {
+	var m = map[string]int{"a": 1, "b": 2}
+	var values = Values(m)
+	slices.Sort(values)
+	assert.EqualValues(t, []int{1, 2}, values)
+}
+
+func TestStripContent(t *testing.T) {
+	var content = "1234567890"
+	assert.EqualValues(t, "123", StripContent(content, 3))
+	assert.EqualValues(t, "1234567890", StripContent(content, 100))
+
+	content = "你好，世界"
+	assert.EqualValues(t, "你好", StripContent(content, 2))
+	assert.EqualValues(t, "你好，世界", StripContent(content, 100))
+}

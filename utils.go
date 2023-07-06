@@ -24,3 +24,19 @@ func Keys[T comparable, S any](m map[T]S) (s []T) {
 	}
 	return s
 }
+
+func Values[T comparable, S any](m map[T]S) (s []S) {
+	for _, v := range m {
+		s = append(s, v)
+	}
+	return s
+}
+
+func StripContent(content string, contentMaxSize int) string {
+	contentRune := []rune(content)
+	contentRuneLength := len(contentRune)
+	if contentRuneLength <= contentMaxSize {
+		return content
+	}
+	return string(contentRune[:contentMaxSize])
+}
