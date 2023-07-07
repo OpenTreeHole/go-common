@@ -20,7 +20,7 @@ func TestTesting(t *testing.T) {
 	})
 
 	type User struct {
-		ID int `json:"id" query:"id"`
+		ID int `json:"id" query:"id" xml:"id" form:"id" validate:"required"`
 	}
 
 	users := map[int]User{}
@@ -36,12 +36,13 @@ func TestTesting(t *testing.T) {
 		return c.SendString("Hello, World!")
 	})
 
-	app.Get("/users", func(c *fiber.Ctx) error {
-		userQuery, err := ValidateQuery[User](c)
+	app.Get("/users", func(c *fiber.Ctx) (err error) {
+		var user User
+		err = ValidateQuery(c, &user)
 		if err != nil {
 			return err
 		}
-		user, ok := users[userQuery.ID]
+		user, ok := users[user.ID]
 		if !ok {
 			return gorm.ErrRecordNotFound
 		}
@@ -49,11 +50,12 @@ func TestTesting(t *testing.T) {
 	})
 
 	app.Post("/users", func(c *fiber.Ctx) error {
-		user, err := ValidateBody[User](c)
+		var user User
+		err := ValidateBody(c, &user)
 		if err != nil {
 			return err
 		}
-		users[user.ID] = *user
+		users[user.ID] = user
 		return c.Status(fiber.StatusCreated).JSON(user)
 	})
 
@@ -65,9 +67,15 @@ func TestTesting(t *testing.T) {
 		return c.JSON(Map{"user_id": userID})
 	})
 
-	app.Post("/form", func(c *fiber.Ctx) error {
-		value := c.FormValue("data")
-		return c.Status(201).SendString(value)
+	app.Post("/form", func(c *fiber.Ctx) (err error) {
+		var body struct {
+			Data string `form:"data"`
+		}
+		err = ValidateBody(c, &body)
+		if err != nil {
+			return err
+		}
+		return c.Status(201).SendString(body.Data)
 	})
 
 	app.Get("/panic", func(c *fiber.Ctx) error {
@@ -89,12 +97,20 @@ func TestTesting(t *testing.T) {
 	// Test GET /users with a non-existing user
 	DefaultTester.Get(t, RequestConfig{Route: "/users", RequestQuery: Map{"id": 11}, ExpectedStatus: fiber.StatusNotFound})
 
-	// Test POST /users
+	// Test POST /users, Content-Type: json
 	var newUser = User{ID: 11}
 	DefaultTester.Post(t, RequestConfig{
 		Route:         "/users",
 		RequestBody:   newUser,
 		ResponseModel: &newUser,
+	})
+
+	// Test Post /users, Content-Type: xml
+	DefaultTester.Post(t, RequestConfig{
+		Route:        "/users",
+		RequestBody:  "<User><id>12</id></User>",
+		ExpectedBody: `{"id":12}`,
+		ContentType:  fiber.MIMEApplicationXML,
 	})
 
 	// Test POST /users with invalid body

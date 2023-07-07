@@ -3,7 +3,6 @@ package common
 import (
 	"github.com/creasty/defaults"
 	"github.com/go-playground/validator/v10"
-	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
 	"reflect"
 	"strings"
@@ -52,44 +51,48 @@ func Validate(model any) error {
 	return nil
 }
 
-// ValidateQuery parse, set default and validate query
-func ValidateQuery[T any](c *fiber.Ctx) (*T, error) {
-	model := new(T)
+// ValidateQuery parse, set default and validate query into model
+func ValidateQuery(c *fiber.Ctx, model any) error {
+	// parse query into struct
+	// see https://docs.gofiber.io/api/ctx/#queryparser
 	err := c.QueryParser(model)
 	if err != nil {
-		return nil, BadRequest(err.Error())
-	}
-	err = defaults.Set(model)
-	if err != nil {
-		return nil, err
-	}
-
-	// validate
-	return model, Validate(model)
-}
-
-// ValidateBody parse, set default and validate body
-// supports json only, if empty, using defaults
-func ValidateBody[T any](c *fiber.Ctx) (*T, error) {
-	body := c.Body()
-	model := new(T)
-	// empty request body, return default value
-	if len(body) == 0 {
-		return model, defaults.Set(model)
-	}
-
-	// unmarshal json
-	err := json.Unmarshal(body, model)
-	if err != nil {
-		return nil, BadRequest(err.Error())
+		return BadRequest(err.Error())
 	}
 
 	// set default value
 	err = defaults.Set(model)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	// validate
-	return model, Validate(model)
+	return Validate(model)
+}
+
+// ValidateBody parse, set default and validate body based on Content-Type.
+// It supports json, xml and form only when struct tag exists; if empty, using defaults.
+func ValidateBody(c *fiber.Ctx, model any) error {
+	body := c.Body()
+
+	// empty request body, return default value
+	if len(body) == 0 {
+		return defaults.Set(model)
+	}
+
+	// parse json, xml and form by fiber.BodyParser into struct
+	// see https://docs.gofiber.io/api/ctx/#bodyparser
+	err := c.BodyParser(model)
+	if err != nil {
+		return BadRequest(err.Error())
+	}
+
+	// set default value
+	err = defaults.Set(model)
+	if err != nil {
+		return err
+	}
+
+	// validate
+	return Validate(model)
 }
