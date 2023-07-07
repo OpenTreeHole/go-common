@@ -39,12 +39,34 @@ func Unauthorized(messages ...string) *HttpError {
 }
 
 func Forbidden(messages ...string) *HttpError {
-	message := "您没有权限进行此操作"
+	message := "Forbidden"
 	if len(messages) > 0 {
 		message = messages[0]
 	}
 	return &HttpError{
 		Code:    403,
+		Message: message,
+	}
+}
+
+func NotFound(messages ...string) *HttpError {
+	message := "Not Found"
+	if len(messages) > 0 {
+		message = messages[0]
+	}
+	return &HttpError{
+		Code:    404,
+		Message: message,
+	}
+}
+
+func InternalServerError(messages ...string) *HttpError {
+	message := "Internal Server Error"
+	if len(messages) > 0 {
+		message = messages[0]
+	}
+	return &HttpError{
+		Code:    500,
 		Message: message,
 	}
 }

@@ -6,7 +6,6 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
-	"gorm.io/gorm"
 	"testing"
 )
 
@@ -44,7 +43,7 @@ func TestTesting(t *testing.T) {
 		}
 		user, ok := users[user.ID]
 		if !ok {
-			return gorm.ErrRecordNotFound
+			return NotFound("User Not Found")
 		}
 		return c.JSON(user)
 	})
@@ -81,7 +80,7 @@ func TestTesting(t *testing.T) {
 	app.Get("/panic", func(c *fiber.Ctx) error {
 		// try panic
 		log.Panic().Msg("panic")
-		return nil
+		return InternalServerError("unreachable")
 	})
 
 	RegisterApp(app)
