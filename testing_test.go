@@ -35,6 +35,10 @@ func TestTesting(t *testing.T) {
 		return c.SendString("Hello, World!")
 	})
 
+	app.Get("/message", func(c *fiber.Ctx) error {
+		return c.JSON(Message("Hello, World!"))
+	})
+
 	app.Get("/users", func(c *fiber.Ctx) (err error) {
 		var user User
 		err = ValidateQuery(c, &user)
