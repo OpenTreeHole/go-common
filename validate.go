@@ -20,10 +20,10 @@ func (e *ErrorDetail) Error() string {
 	return "Validation Error"
 }
 
-var validate = validator.New()
+var Validate = validator.New()
 
 func init() {
-	validate.RegisterTagNameFunc(func(fld reflect.StructField) string {
+	Validate.RegisterTagNameFunc(func(fld reflect.StructField) string {
 		name := strings.SplitN(fld.Tag.Get("json"), ",", 2)[0]
 
 		if name == "-" {
@@ -34,8 +34,8 @@ func init() {
 	})
 }
 
-func Validate(model any) error {
-	errors := validate.Struct(model)
+func ValidateStruct(model any) error {
+	errors := Validate.Struct(model)
 	if errors != nil {
 		var errorDetail ErrorDetail
 		for _, err := range errors.(validator.ValidationErrors) {
@@ -66,8 +66,8 @@ func ValidateQuery(c *fiber.Ctx, model any) error {
 		return err
 	}
 
-	// validate
-	return Validate(model)
+	// Validate
+	return ValidateStruct(model)
 }
 
 // ValidateBody parse, set default and validate body based on Content-Type.
@@ -93,6 +93,6 @@ func ValidateBody(c *fiber.Ctx, model any) error {
 		return err
 	}
 
-	// validate
-	return Validate(model)
+	// Validate
+	return ValidateStruct(model)
 }
