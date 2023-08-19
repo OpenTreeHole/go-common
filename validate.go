@@ -1,11 +1,12 @@
 package common
 
 import (
+	"reflect"
+	"strings"
+
 	"github.com/creasty/defaults"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
-	"reflect"
-	"strings"
 )
 
 type ErrorDetailElement struct {

@@ -1,11 +1,12 @@
 package common
 
 import (
-	"github.com/gofiber/fiber/v2"
-	"github.com/rs/zerolog/log"
 	"runtime/debug"
 	"strconv"
 	"time"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/rs/zerolog/log"
 )
 
 func GetUserID(c *fiber.Ctx) (int, error) {

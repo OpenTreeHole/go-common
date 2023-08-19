@@ -1,9 +1,10 @@
 package common
 
 import (
+	"testing"
+
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/exp/slices"
-	"testing"
 )
 
 func TestMax(t *testing.T) {

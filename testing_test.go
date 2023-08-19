@@ -1,12 +1,13 @@
 package common
 
 import (
+	"testing"
+
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestTesting(t *testing.T) {
@@ -87,6 +88,20 @@ func TestTesting(t *testing.T) {
 		return InternalServerError("unreachable")
 	})
 
+	app.Get("/errors/400001", func(c *fiber.Ctx) error {
+		return &HttpError{
+			Code:    400001,
+			Message: "custom errors",
+		}
+	})
+
+	app.Get("/errors/114514", func(c *fiber.Ctx) error {
+		return &HttpError{
+			Code:    114514,
+			Message: "custom errors",
+		}
+	})
+
 	RegisterApp(app)
 
 	// Test GET /
@@ -153,4 +168,10 @@ func TestTesting(t *testing.T) {
 
 	// Test Get /panic
 	DefaultTester.Get(t, RequestConfig{Route: "/panic", ExpectedStatus: fiber.StatusInternalServerError})
+
+	// Test Get /errors/400001
+	DefaultTester.Get(t, RequestConfig{Route: "/errors/400001", ExpectedStatus: 400})
+
+	// Test Get /errors/114514
+	DefaultTester.Get(t, RequestConfig{Route: "/errors/114514", ExpectedStatus: 500})
 }

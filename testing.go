@@ -4,13 +4,14 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"io"
+	"net/http"
+
 	"github.com/creasty/defaults"
 	"github.com/gofiber/fiber/v2"
 	"github.com/hetiansu5/urlquery"
 	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
-	"io"
-	"net/http"
 )
 
 // Tester is a struct that mocks a request user
@@ -31,6 +32,8 @@ var (
 		2: AdminTester,
 	} // map[userID]Tester
 )
+
+var _ = OtherTester
 
 // RegisterApp registers the fiber app to the common package
 // It should be called before any test

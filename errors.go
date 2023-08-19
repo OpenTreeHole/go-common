@@ -2,6 +2,8 @@ package common
 
 import (
 	"errors"
+	"strconv"
+
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
@@ -101,5 +103,20 @@ func ErrorHandler(ctx *fiber.Ctx, err error) error {
 		}
 	}
 
-	return ctx.Status(httpError.Code).JSON(&httpError)
+	// parse status code
+	// when status code is 400xxx to 599xxx, use leading 3 numbers instead
+	// else use 500
+	statusCode := httpError.Code
+	statusCodeString := strconv.Itoa(statusCode)
+	if len(statusCodeString) > 3 {
+		statusCodeString = statusCodeString[:3]
+		newStatusCode, err := strconv.Atoi(statusCodeString)
+		if err == nil && newStatusCode >= 400 && newStatusCode < 600 {
+			statusCode = newStatusCode
+		} else {
+			statusCode = 500
+		}
+	}
+
+	return ctx.Status(statusCode).JSON(&httpError)
 }

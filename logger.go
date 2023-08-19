@@ -1,9 +1,13 @@
 package common
 
 import (
-	"github.com/rs/zerolog"
+	"os"
 	"time"
+
+	"github.com/rs/zerolog"
 )
+
+var Logger = zerolog.New(os.Stdout).With().Timestamp().Logger()
 
 func init() {
 	// compatible with zap and old spec

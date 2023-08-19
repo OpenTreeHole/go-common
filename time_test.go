@@ -2,8 +2,9 @@ package common
 
 import (
 	"fmt"
-	"github.com/goccy/go-json"
 	"testing"
+
+	"github.com/goccy/go-json"
 )
 
 type TimeModel struct {

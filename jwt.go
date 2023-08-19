@@ -3,10 +3,11 @@ package common
 import (
 	"encoding/base64"
 	"errors"
+	"strings"
+
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog/log"
-	"strings"
 )
 
 var (
