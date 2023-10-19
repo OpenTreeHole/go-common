@@ -10,12 +10,13 @@ import (
 )
 
 type ErrorDetailElement struct {
-	Tag     string       `json:"tag"`
-	Field   string       `json:"field"`
-	Kind    reflect.Kind `json:"-"`
-	Value   string       `json:"value"`
-	Param   string       `json:"param"`
-	Message string       `json:"message"`
+	Tag         string       `json:"tag"`
+	Field       string       `json:"field"`
+	Kind        reflect.Kind `json:"-"`
+	Value       string       `json:"value"`
+	Param       string       `json:"param"`
+	StructField string       `json:"struct_field"`
+	Message     string       `json:"message"`
 }
 
 func (e *ErrorDetailElement) Error() string {
@@ -39,7 +40,9 @@ func (e *ErrorDetailElement) Error() string {
 	case "required":
 		e.Message = e.Field + "不能为空"
 	case "email":
-		e.Message = e.Field + "格式不正确"
+		e.Message = "邮箱格式不正确"
+	default:
+		e.Message = e.StructField + "格式不正确"
 	}
 
 	return e.Message
@@ -85,11 +88,12 @@ func ValidateStruct(model any) error {
 		var errorDetail ErrorDetail
 		for _, err := range errors.(validator.ValidationErrors) {
 			detail := ErrorDetailElement{
-				Field: err.Field(),
-				Tag:   err.Tag(),
-				Param: err.Param(),
-				Kind:  err.Kind(),
-				Value: err.Param(),
+				Field:       err.Field(),
+				Tag:         err.Tag(),
+				Param:       err.Param(),
+				Kind:        err.Kind(),
+				Value:       err.Param(),
+				StructField: err.StructField(),
 			}
 			errorDetail = append(errorDetail, &detail)
 		}
