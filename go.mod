@@ -4,12 +4,13 @@ go 1.20
 
 require (
 	github.com/creasty/defaults v1.7.0
-	github.com/go-playground/validator/v10 v10.15.1
+	github.com/go-playground/validator/v10 v10.15.4
 	github.com/goccy/go-json v0.10.2
 	github.com/gofiber/fiber/v2 v2.48.0
 	github.com/hetiansu5/urlquery v1.2.7
 	github.com/rs/zerolog v1.30.0
 	github.com/stretchr/testify v1.8.4
+	go.uber.org/zap v1.26.0
 	golang.org/x/exp v0.0.0-20230817173708-d852ddb80c63
 	gorm.io/gorm v1.25.4
 )
@@ -33,6 +34,7 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.48.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
+	go.uber.org/multierr v1.10.0 // indirect
 	golang.org/x/crypto v0.12.0 // indirect
 	golang.org/x/net v0.14.0 // indirect
 	golang.org/x/sys v0.11.0 // indirect
