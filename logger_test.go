@@ -11,5 +11,5 @@ func TestLog(t *testing.T) {
 
 	log.Info().Msg("hello world")
 
-	Logger.Info().Msg("hello world")
+	LoggerOld.Info().Msg("hello world")
 }
