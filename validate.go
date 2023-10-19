@@ -92,7 +92,7 @@ func ValidateStruct(model any) error {
 				Tag:         err.Tag(),
 				Param:       err.Param(),
 				Kind:        err.Kind(),
-				Value:       err.Param(),
+				Value:       err.Value(),
 				StructField: err.StructField(),
 			}
 			errorDetail = append(errorDetail, &detail)
