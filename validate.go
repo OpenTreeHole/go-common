@@ -13,7 +13,7 @@ type ErrorDetailElement struct {
 	Tag         string       `json:"tag"`
 	Field       string       `json:"field"`
 	Kind        reflect.Kind `json:"-"`
-	Value       string       `json:"value"`
+	Value       any          `json:"value"`
 	Param       string       `json:"param"`
 	StructField string       `json:"struct_field"`
 	Message     string       `json:"message"`
