@@ -10,15 +10,59 @@ import (
 )
 
 type ErrorDetailElement struct {
-	Field string `json:"field"`
-	Tag   string `json:"tag"`
-	Value string `json:"value"`
+	Tag     string       `json:"tag"`
+	Field   string       `json:"field"`
+	Kind    reflect.Kind `json:"-"`
+	Value   string       `json:"value"`
+	Param   string       `json:"param"`
+	Message string       `json:"message"`
+}
+
+func (e *ErrorDetailElement) Error() string {
+	if e.Message != "" {
+		return e.Message
+	}
+
+	switch e.Tag {
+	case "min":
+		if e.Kind == reflect.String {
+			e.Message = e.Field + "至少" + e.Param + "字符"
+		} else {
+			e.Message = e.Field + "至少为" + e.Param
+		}
+	case "max":
+		if e.Kind == reflect.String {
+			e.Message = e.Field + "限长" + e.Param + "字符"
+		} else {
+			e.Message = e.Field + "至多为" + e.Param
+		}
+	case "required":
+		e.Message = e.Field + "不能为空"
+	case "email":
+		e.Message = e.Field + "格式不正确"
+	}
+
+	return e.Message
 }
 
 type ErrorDetail []*ErrorDetailElement
 
-func (e *ErrorDetail) Error() string {
-	return "Validation Error"
+func (e ErrorDetail) Error() string {
+	if len(e) == 0 {
+		return "Validation Error"
+	}
+
+	if len(e) == 1 {
+		return e[0].Error()
+	}
+
+	var stringBuilder strings.Builder
+	stringBuilder.WriteString(e[0].Error())
+	for _, err := range e[1:] {
+		stringBuilder.WriteString(", ")
+		stringBuilder.WriteString(err.Error())
+	}
+	return stringBuilder.String()
 }
 
 var Validate = validator.New()
@@ -43,6 +87,8 @@ func ValidateStruct(model any) error {
 			detail := ErrorDetailElement{
 				Field: err.Field(),
 				Tag:   err.Tag(),
+				Param: err.Param(),
+				Kind:  err.Kind(),
 				Value: err.Param(),
 			}
 			errorDetail = append(errorDetail, &detail)
