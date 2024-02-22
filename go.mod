@@ -6,7 +6,7 @@ require (
 	github.com/creasty/defaults v1.7.0
 	github.com/go-playground/validator/v10 v10.16.0
 	github.com/goccy/go-json v0.10.2
-	github.com/gofiber/fiber/v2 v2.51.0
+	github.com/gofiber/fiber/v2 v2.52.1
 	github.com/hetiansu5/urlquery v1.2.7
 	github.com/rs/zerolog v1.31.0
 	github.com/stretchr/testify v1.8.4
