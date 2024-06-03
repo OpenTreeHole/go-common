@@ -1,6 +1,7 @@
 package common
 
 import (
+	"github.com/goccy/go-json"
 	"runtime/debug"
 	"strconv"
 	"time"
@@ -80,7 +81,14 @@ func MiddlewareCustomLogger(c *fiber.Ctx) error {
 		output = output.Err(chainErr)
 	}
 	if c.Method() == "POST" || c.Method() == "PUT" {
-		output = output.Bytes("body", c.Body())
+		var body = make(map[string]any)
+		err := json.Unmarshal(c.Body(), &body)
+		if err != nil {
+			output = output.Bytes("body", c.Body())
+		} else {
+			delete(body, "password")
+			output = output.Any("body", body)
+		}
 	}
 	output.Msg("http log")
 	return nil
