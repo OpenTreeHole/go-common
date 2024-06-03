@@ -79,6 +79,9 @@ func MiddlewareCustomLogger(c *fiber.Ctx) error {
 	if chainErr != nil {
 		output = output.Err(chainErr)
 	}
+	if c.Method() == "POST" || c.Method() == "PUT" {
+		output = output.Bytes("body", c.Body())
+	}
 	output.Msg("http log")
 	return nil
 }
