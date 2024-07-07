@@ -73,6 +73,7 @@ func MiddlewareCustomLogger(c *fiber.Ctx) error {
 		Str("method", c.Method()).
 		Str("origin_url", c.OriginalURL()).
 		Str("remote_ip", c.Get("X-Real-IP")).
+		Str("user_agent", c.Get("User-Agent", "")).
 		Int64("latency", latency)
 	if ok {
 		output = output.Int("user_id", userID)
