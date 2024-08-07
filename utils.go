@@ -40,3 +40,11 @@ func StripContent(content string, contentMaxSize int) string {
 	}
 	return string(contentRune[:contentMaxSize])
 }
+
+func StripBytes(content []byte, contentMaxSize int) []byte {
+	contentLength := len(content)
+	if contentLength <= contentMaxSize {
+		return content
+	}
+	return content[:contentMaxSize]
+}

@@ -93,7 +93,7 @@ func MiddlewareCustomLogger(c *fiber.Ctx) error {
 		var body = make(map[string]any)
 		err := json.Unmarshal(c.Body(), &body)
 		if err != nil {
-			output = output.Bytes("body", c.Body()[0:32])
+			output = output.Bytes("body", StripBytes(c.Body(), 32))
 		} else {
 			delete(body, "password")
 			output = output.Any("body", body)
