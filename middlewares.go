@@ -68,13 +68,16 @@ func MiddlewareCustomLogger(c *fiber.Ctx) error {
 	latency := time.Since(startTime).Milliseconds()
 	userID, ok := c.Locals("user_id").(int)
 
+	contentType := string(c.Request().Header.ContentType())
+
 	output := log.Info().
 		Int("status_code", c.Response().StatusCode()).
 		Str("method", c.Method()).
 		Str("origin_url", c.OriginalURL()).
 		Str("remote_ip", c.Get("X-Real-IP")).
 		Str("user_agent", c.Get("User-Agent", "")).
-		Int64("latency", latency)
+		Int64("latency", latency).
+		Str("content_type", contentType)
 	if ok {
 		output = output.Int("user_id", userID)
 	}
@@ -85,7 +88,7 @@ func MiddlewareCustomLogger(c *fiber.Ctx) error {
 		var body = make(map[string]any)
 		err := json.Unmarshal(c.Body(), &body)
 		if err != nil {
-			output = output.Bytes("body", c.Body())
+			output = output.Bytes("body", c.Body()[0:32])
 		} else {
 			delete(body, "password")
 			output = output.Any("body", body)
