@@ -78,6 +78,11 @@ func MiddlewareCustomLogger(c *fiber.Ctx) error {
 		Str("user_agent", c.Get("User-Agent", "")).
 		Int64("latency", latency).
 		Str("content_type", contentType)
+
+	xForwardFor := c.Get("X-Forwarded-For")
+	if xForwardFor != "" {
+		output = output.Str("x_forwarded_for", xForwardFor)
+	}
 	if ok {
 		output = output.Int("user_id", userID)
 	}
